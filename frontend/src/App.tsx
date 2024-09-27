@@ -30,7 +30,12 @@ function App() {
     };
 
     return (
-        <div className="App">
+        <div>
+            <h1>First Down Detector</h1>
+            <p>Have you ever wondered whether a play was <i>really</i> a first down?
+            Were the referees being completely fair? Fear no more. With <b>First Down Detector</b>
+            you can now determine whether a specific play was a first down or not. Just submit a clip below of the play
+            and our algorithm will determine if it was a first down or not.</p>
             <input type="file" onChange={handleFileChange} />
             <button onClick={handleUpload}>Upload</button>
         </div>
