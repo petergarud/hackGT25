@@ -1,13 +1,19 @@
 import axios from "axios";
 import './App.css';
 import React, { useState } from "react";
+import { FileUploader } from "react-drag-drop-files";
 
 function App() {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [fileURL, setFileURL] = useState<string | undefined>(undefined);
 
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (event.target.files) {
-            setSelectedFile(event.target.files[0]);
+    const handleFileChange = (file: File) => {
+        if (file) {
+            setSelectedFile(file);
+            let temp:string = URL.createObjectURL(file);
+            setFileURL(temp);
+            console.log(temp);
+            console.log(fileURL);
         }
     };
 
@@ -29,14 +35,21 @@ function App() {
         }
     };
 
+    const fileTypes = ["MP3", "MOV", "GIF"];
+
     return (
         <div>
             <h1>First Down Detector</h1>
             <p>Have you ever wondered whether a play was <i>really</i> a first down?
-            Were the referees being completely fair? Fear no more. With <b>First Down Detector</b>
+            Were the referees being completely fair? Fear no more. With <b>First Down Detector </b>
             you can now determine whether a specific play was a first down or not. Just submit a clip below of the play
-            and our algorithm will determine if it was a first down or not.</p>
-            <input type="file" onChange={handleFileChange} />
+            and our algorithm will determine if it was a first down.</p>
+            {selectedFile && (
+            <video width="640" height="360" controls>
+                <source src={fileURL} type={selectedFile.type} />
+            </video>
+      )}
+            <FileUploader handleChange={handleFileChange} name="files" types={fileTypes}/>
             <button onClick={handleUpload}>Upload</button>
         </div>
     );
