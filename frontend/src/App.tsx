@@ -1,19 +1,21 @@
 import axios from "axios";
 import './App.css';
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FileUploader } from "react-drag-drop-files";
 
 function App() {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [fileURL, setFileURL] = useState<string | undefined>(undefined);
 
+    useEffect(() => {
+        console.log(fileURL);
+    }, [fileURL]);
+
     const handleFileChange = (file: File) => {
         if (file) {
             setSelectedFile(file);
-            let temp:string = URL.createObjectURL(file);
+            const temp = URL.createObjectURL(file);
             setFileURL(temp);
-            console.log(temp);
-            console.log(fileURL);
         }
     };
 
@@ -35,7 +37,7 @@ function App() {
         }
     };
 
-    const fileTypes = ["MP3", "MOV", "GIF"];
+    const fileTypes = ["MP4", "MOV", "GIF"];
 
     return (
         <div>
@@ -47,6 +49,7 @@ function App() {
             {selectedFile && (
             <video width="640" height="360" controls>
                 <source src={fileURL} type={selectedFile.type} />
+                Your browser does not support the video tag.
             </video>
       )}
             <FileUploader handleChange={handleFileChange} name="files" types={fileTypes}/>
