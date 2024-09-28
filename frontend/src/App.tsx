@@ -2,21 +2,46 @@ import axios from "axios";
 import './App.css';
 import React, { useState, useEffect } from "react";
 import { FileUploader } from "react-drag-drop-files";
+import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg';
+
+const ffmpeg = createFFmpeg({ log: true });
 
 function App() {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [fileURL, setFileURL] = useState<string | undefined>(undefined);
+    const [isConverting, setIsConverting] = useState<boolean>(false);
 
     useEffect(() => {
         console.log(fileURL);
     }, [fileURL]);
 
-    const handleFileChange = (file: File) => {
+    const handleFileChange = async (file: File) => {
         if (file) {
             setSelectedFile(file);
             const temp = URL.createObjectURL(file);
             setFileURL(temp);
+
+            // Convert file to MP4
+            setIsConverting(true);
+            await convertToMP4(file);
+            setIsConverting(false);
         }
+    };
+
+    const convertToMP4 = async (file: File) => {
+        if (!ffmpeg.isLoaded()) {
+            await ffmpeg.load();
+        }
+        ffmpeg.FS('writeFile', file.name, await fetchFile(file));
+        await ffmpeg.run('-i', file.name, 'output.mp4');
+        const data = ffmpeg.FS('readFile', 'output.mp4');
+
+        const mp4Blob = new Blob([data.buffer], { type: 'video/mp4' });
+        const mp4File = new File([mp4Blob], 'output.mp4', { type: 'video/mp4' });
+
+        setSelectedFile(mp4File);
+        const mp4URL = URL.createObjectURL(mp4File);
+        setFileURL(mp4URL);
     };
 
     const handleUpload = async () => {
@@ -46,14 +71,15 @@ function App() {
             Were the referees being completely fair? Fear no more. With <b>First Down Detector </b>
             you can now determine whether a specific play was a first down or not. Just submit a clip below of the play
             and our algorithm will determine if it was a first down.</p>
-            {selectedFile && (
-            <video width="640" height="360" controls>
-                <source src={fileURL} type={selectedFile.type}/>
+            {isConverting && <p>Converting video, please wait...</p>}
+            {selectedFile && !isConverting && (
+            <video key={fileURL} width="640" height="360" controls>
+                <source src={fileURL} type="video/mp4"/>
                 Your browser does not support the video tag.
             </video>
       )}
             <FileUploader handleChange={handleFileChange} name="files" types={fileTypes}/>
-            <button onClick={handleUpload}>Detect</button>
+            <button onClick={handleUpload} disabled={isConverting}>Upload</button>
         </div>
     );
 }
