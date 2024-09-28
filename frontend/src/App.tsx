@@ -48,7 +48,7 @@ function App() {
             and our algorithm will determine if it was a first down.</p>
             {selectedFile && (
             <video width="640" height="360" controls>
-                <source src={fileURL} type={selectedFile.type} />
+                <source src={fileURL} type="video/mp4"/>
                 Your browser does not support the video tag.
             </video>
       )}
