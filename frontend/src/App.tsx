@@ -48,12 +48,12 @@ function App() {
             and our algorithm will determine if it was a first down.</p>
             {selectedFile && (
             <video width="640" height="360" controls>
-                <source src={fileURL} type="video/mp4"/>
+                <source src={fileURL} type={selectedFile.type}/>
                 Your browser does not support the video tag.
             </video>
       )}
             <FileUploader handleChange={handleFileChange} name="files" types={fileTypes}/>
-            <button onClick={handleUpload}>Upload</button>
+            <button onClick={handleUpload}>Detect</button>
         </div>
     );
 }
