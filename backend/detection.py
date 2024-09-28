@@ -7,9 +7,11 @@ import requests
 from io import BytesIO
 from ultralytics import YOLO
 from flask import Flask, request, send_file
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
+
+CORS(app, support_credentials=True)
 
 def detector(frame, result):
     # Loads an image
@@ -19,23 +21,23 @@ def detector(frame, result):
     # Check if image is loaded fine
     if src is None:
         print ('Error opening image!')
-    
+
     dst = cv.Canny(gray, 10, 30, None, 3)
 
     cdst = cv.cvtColor(dst, cv.COLOR_GRAY2BGR)
     cdstP = np.copy(cdst)
-        
+
     down_lines = []
 
     linesP = cv.HoughLinesP(dst, 1, np.pi / 200, 50, None, 100, 10)
-        
+
     if linesP is not None:
         for i in range(0, len(linesP)):
             l = linesP[i][0]
-            if ((src[l[1], l[0]][1] >= 120 and src[l[1], l[0]][2] >= 120) and src[l[1], l[0]][0] < 60): 
+            if ((src[l[1], l[0]][1] >= 120 and src[l[1], l[0]][2] >= 120) and src[l[1], l[0]][0] < 60):
                 cv.line(cdstP, (l[0], l[1]), (l[2], l[3]), (6,155,155), 3, cv.LINE_AA)
                 down_lines.append(l)
-            elif ((src[l[3], l[2]][1] >= 120 and src[l[3], l[2]][2] >= 120) and src[l[3], l[2]][0] < 60): 
+            elif ((src[l[3], l[2]][1] >= 120 and src[l[3], l[2]][2] >= 120) and src[l[3], l[2]][0] < 60):
                 cv.line(cdstP, (l[0], l[1]), (l[2], l[3]), (6,155,155), 3, cv.LINE_AA)
                 down_lines.append(l)
     if len(down_lines) != 0:
@@ -79,7 +81,9 @@ def detect_frames(filename, results):
         if down[0] == True: return down
 
 @app.route('/upload', methods=['GET', 'POST'])
+@cross_origin(supports_credentials=True)
 def upload():
+    print("Hello")
     file = request.files['file']
     name = file.filename
     destination = "Uploads/" + name
@@ -88,4 +92,3 @@ def upload():
     results = model.predict(destination, conf = 0.05)
     is_first_down, frame = detect_frames(destination, results)
     if is_first_down: return (is_first_down, frame)
-        
