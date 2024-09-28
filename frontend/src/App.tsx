@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { FileUploader } from "react-drag-drop-files";
 import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { fetchFile } from '@ffmpeg/util';
+import api from './api';
 
 const ffmpeg = new FFmpeg();
 
@@ -56,15 +57,15 @@ function App() {
         formData.append('file', selectedFile);
 
         try {
-            const response = await axios.post('http://localhost:5000/upload', formData, {
+            const response = await api.post('/upload', formData, {
                 headers: {
-                    'Content-Type': 'multipart/form-data',
-                    'access-control-allow-origin': '*',
+                    'Content-Type': 'multipart/form-data'
                 }
             });
             console.log('File uploaded successfully', response.data);
         } catch (error) {
             console.error('Error uploading file', error);
+            //console.log(error.response);
         }
     };
 
