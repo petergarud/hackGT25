@@ -1,5 +1,5 @@
 import axios from "axios";
-import {Buffer} from 'buffer';
+import { Buffer } from 'buffer';
 import './App.css';
 import React, { useState, useEffect } from "react";
 import { FileUploader } from "react-drag-drop-files";
@@ -55,7 +55,7 @@ function App() {
 
     const handleUpload = async () => {
         if (!selectedFile) return;
-        
+
         const formData = new FormData();
         formData.append('file', selectedFile);
 
@@ -82,22 +82,28 @@ function App() {
         <div>
             <h1>First Down Detector</h1>
             <p>Have you ever wondered whether a play was <i>really</i> a first down?
-            Were the referees being completely fair? Fear no more. With <b>First Down Detector </b>
-            you can now determine whether a specific play was a first down or not. Just submit a clip below of the play
-            and our algorithm will determine if it was a first down.</p>
+                Were the referees being completely fair? Fear no more. With <b>First Down Detector </b>
+                you can now determine whether a specific play was a first down or not. Just submit a clip below of the play
+                and our algorithm will determine if it was a first down.</p>
             {isConverting && <p>Converting file, please wait...</p>}
             {selectedFile && !isConverting && !isImage && (
-            <video key={fileURL} width="640" height="360" controls>
-                <source src={fileURL} type="video/mp4"/>
-                Your browser does not support the video tag.
-            </video>
+                <div className="media-container">
+                    <video className="file-url-video" key={fileURL} controls>
+                        <source src={fileURL} type="video/mp4" />
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
             )}
             {selectedFile && !isConverting && isImage && (
-            <img src={fileURL} width="640" height="360" alt="Display not working"/>
+                <img src={fileURL} className="media-container" alt="Display not working" />
             )}
-            <FileUploader handleChange={handleFileChange} name="files" types={fileTypes}/>
-            <button onClick={handleUpload} disabled={isConverting}>Upload</button>
-            {firstDown && (<img src={`data:image/jpeg;charset=utf-8;base64,${firstDown}`} width="640" height="360" alt="First Down"/>
+            <FileUploader handleChange={handleFileChange} name="files" types={fileTypes} />
+            {selectedFile && (
+                <div className="media-container">
+                    <button className="green-button" onClick={handleUpload} disabled={isConverting}>Detect</button>
+                </div>
+            )}
+            {firstDown && (<img src={`data:image/jpeg;charset=utf-8;base64,${firstDown}`} className="first-down-image" alt="First Down" />
             )}
         </div>
     );
