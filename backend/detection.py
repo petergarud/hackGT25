@@ -88,6 +88,6 @@ def upload():
     name = file.filename
     destination = "Uploads/" + name
     file.save(destination)
-    model = YOLO("football.pt")
-    results = model.predict(destination, conf = 0.05)
+    model = YOLO("football2.pt")
+    results = model.predict(destination, conf = 0.65)
     return detect_frames(destination, results)

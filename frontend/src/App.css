@@ -53,13 +53,18 @@
 .media-container {
   display: flex;
   align-items: center;
-  width: 640px;
+  width: 40%;
   margin: 10px;
+  flex: 50%;
   gap: 10px; /* Optional: Add some space between the video and the image */
 }
 
 .first-down-image {
   margin: 10px;
+  width : 40%;
+  float : right;
+  flex: 50%;
+  display : flex;
 }
 
 
@@ -70,4 +75,12 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+body {
+  background-color: white;
+  color: black;
+  padding: 40px;
+  font-family: Arial;
+  text-align: center;
 }
