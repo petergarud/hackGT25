@@ -1,4 +1,5 @@
 import axios from "axios";
+import {Buffer} from 'buffer';
 import './App.css';
 import React, { useState, useEffect } from "react";
 import { FileUploader } from "react-drag-drop-files";
@@ -9,10 +10,12 @@ import api from './api';
 const ffmpeg = new FFmpeg();
 
 function App() {
+    const [firstDown, setFirstDown] = useState<string | undefined>(undefined);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [fileURL, setFileURL] = useState<string | undefined>(undefined);
     const [isConverting, setIsConverting] = useState<boolean>(false);
     const [isImage, setIsImage] = useState<boolean>(false);
+    const [base64, setBase64] = useState();
 
     useEffect(() => {
         console.log(fileURL);
@@ -52,7 +55,7 @@ function App() {
 
     const handleUpload = async () => {
         if (!selectedFile) return;
-
+        
         const formData = new FormData();
         formData.append('file', selectedFile);
 
@@ -60,9 +63,13 @@ function App() {
             const response = await api.post('/upload', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
-                }
-            });
-            console.log('File uploaded successfully', response.data);
+                },
+                responseType: "arraybuffer",
+            }).then(function (response) {
+                console.log(response.data);
+                setFirstDown(Buffer.from(response.data, "binary").toString("base64"))
+            })
+            // console.log('File uploaded successfully', response.data);
         } catch (error) {
             console.error('Error uploading file', error);
             //console.log(error.response);
@@ -90,6 +97,8 @@ function App() {
             )}
             <FileUploader handleChange={handleFileChange} name="files" types={fileTypes}/>
             <button onClick={handleUpload} disabled={isConverting}>Upload</button>
+            {firstDown && (<img src={`data:image/jpeg;charset=utf-8;base64,${firstDown}`} width="640" height="360" alt="First Down"/>
+            )}
         </div>
     );
 }
