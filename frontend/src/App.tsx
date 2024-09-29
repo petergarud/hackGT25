@@ -1,17 +1,22 @@
 import axios from "axios";
+import { Buffer } from 'buffer';
 import './App.css';
 import React, { useState, useEffect } from "react";
 import { FileUploader } from "react-drag-drop-files";
 import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { fetchFile } from '@ffmpeg/util';
+import api from './api';
 
 const ffmpeg = new FFmpeg();
 
 function App() {
+    const [firstDown, setFirstDown] = useState<string | undefined>(undefined);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [fileURL, setFileURL] = useState<string | undefined>(undefined);
     const [isConverting, setIsConverting] = useState<boolean>(false);
     const [isImage, setIsImage] = useState<boolean>(false);
+    const [base64, setBase64] = useState();
+    const [isUploading, setIsUploading] = useState<boolean>(false);
 
     useEffect(() => {
         console.log(fileURL);
@@ -54,40 +59,59 @@ function App() {
 
         const formData = new FormData();
         formData.append('file', selectedFile);
-
+        setIsUploading(true);
         try {
-            const response = await axios.post('/upload', formData, {
+            const response = await api.post('/upload', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
-                }
-            });
-            console.log('File uploaded successfully', response.data);
+                },
+                responseType: "arraybuffer",
+            }).then(function (response) {
+                console.log(response.data);
+                setFirstDown(Buffer.from(response.data, "binary").toString("base64"))
+            })
+            // console.log('File uploaded successfully', response.data);
         } catch (error) {
             console.error('Error uploading file', error);
+            //console.log(error.response);
         }
+        setIsUploading(false);
     };
 
     const fileTypes = ["MP4", "MOV", "PNG", "JPEG"];
 
     return (
         <div>
-            <h1>First Down Detector</h1>
+            <header className="header-bar">
+                <div className="logo-container">
+                    <img src={"/football_logo.png"} alt="Logo" className="logo" />
+                    <h1>First Down Detector</h1>
+                </div>
+            </header>
             <p>Have you ever wondered whether a play was <i>really</i> a first down?
-            Were the referees being completely fair? Fear no more. With <b>First Down Detector </b>
-            you can now determine whether a specific play was a first down or not. Just submit a clip below of the play
-            and our algorithm will determine if it was a first down.</p>
+                Were the referees being completely fair? With <b>First Down Detector </b>
+                you can now determine whether a specific play was a first down or not. Just submit a clip below of the play
+                and our algorithm will determine if it was a first down.</p>
             {isConverting && <p>Converting file, please wait...</p>}
-            {selectedFile && !isConverting && !isImage && (
-            <video key={fileURL} width="640" height="360" controls>
-                <source src={fileURL} type="video/mp4"/>
-                Your browser does not support the video tag.
-            </video>
+            <div className="left-container">
+                {selectedFile && !isConverting && !isImage && (
+                    <video key={fileURL} className="file-url" controls>
+                        <source src={fileURL} type="video/mp4" />
+                        Your browser does not support the video tag.
+                    </video>
+                )}
+                {selectedFile && !isConverting && isImage && (
+                    <img src={fileURL} className="file-url" alt="Display not working" />
+                )}
+                <FileUploader handleChange={handleFileChange} name="files" types={fileTypes} />
+                <button onClick={handleUpload} className="green-button" disabled={isConverting && isUploading} >Detect</button>
+            </div>
+            {isUploading && (<div>
+                    <div className="loading loading--full-height"></div>
+                    {/* <div className="loading-2 loading-2--full-height"></div> */}
+            </div>)}
+            {firstDown && !isUploading && (<img src={`data:image/jpeg;charset=utf-8;base64,${firstDown}`} width="640" height="360" alt="First Down" />
             )}
-            {selectedFile && !isConverting && isImage && (
-            <img src={fileURL} width="640" height="360" alt="Display not working"/>
-            )}
-            <FileUploader handleChange={handleFileChange} name="files" types={fileTypes}/>
-            <button onClick={handleUpload} disabled={isConverting}>Upload</button>
         </div>
     );
 }
