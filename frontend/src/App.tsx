@@ -82,9 +82,14 @@ function App() {
 
     return (
         <div>
-            <h1>First Down Detector</h1>
+            <header className="header-bar">
+                <div className="logo-container">
+                    <img src={"/football_logo.png"} alt="Logo" className="logo" />
+                    <h1>First Down Detector</h1>
+                </div>
+            </header>
             <p>Have you ever wondered whether a play was <i>really</i> a first down?
-                Were the referees being completely fair? Fear no more. With <b>First Down Detector </b>
+                Were the referees being completely fair? With <b>First Down Detector </b>
                 you can now determine whether a specific play was a first down or not. Just submit a clip below of the play
                 and our algorithm will determine if it was a first down.</p>
             {isConverting && <p>Converting file, please wait...</p>}
@@ -99,7 +104,7 @@ function App() {
                     <img src={fileURL} className="file-url" alt="Display not working" />
                 )}
                 <FileUploader handleChange={handleFileChange} name="files" types={fileTypes} />
-                <button onClick={handleUpload} className="green-button" disabled={isConverting && isUploading} >Upload</button>
+                <button onClick={handleUpload} className="green-button" disabled={isConverting && isUploading} >Detect</button>
             </div>
             {isUploading && (<div>
                     <div className="loading loading--full-height"></div>
