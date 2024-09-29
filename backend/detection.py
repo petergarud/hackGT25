@@ -64,11 +64,10 @@ def detector(frame, result):
                     print(x, y, first_down[0], first_down[1], first_down[2], first_down[3])
                     cv.imwrite("down.png", down)
                     cv.imwrite("footballdetectedP.png", cdstP)
-                    return (True, send_file("down.png", mimetype='image/png'))
+                    return send_file("down.png", mimetype='image/png')
     cv.imwrite("edges.png", dst)
     #cv.imwrite("footballdetected.png", cdst)
     #return last frame and False
-    return (False, None)
 
 def detect_frames(filename, results):
     cap = cv.VideoCapture(filename)
@@ -76,18 +75,19 @@ def detect_frames(filename, results):
         result = results[i]
         frame = result.plot()[:,:,::-1]
         ret, frame = cap.read()
+        if i == len(results) - 1:
+            cv.imwrite("lastframe.png", frame)
         down = detector(frame, result)
-        if down[0] == True: return down
+        if down: return down
+    return send_file("lastframe.png", mimetype='image/png')
 
 @app.route('/upload', methods=['GET', 'POST'])
 @cross_origin(supports_credentials=True)
 def upload():
-    print("Hello")
     file = request.files['file']
     name = file.filename
     destination = "Uploads/" + name
     file.save(destination)
     model = YOLO("football.pt")
     results = model.predict(destination, conf = 0.05)
-    is_first_down, frame = detect_frames(destination, results)
-    if is_first_down: return (is_first_down, frame)
+    return detect_frames(destination, results)
