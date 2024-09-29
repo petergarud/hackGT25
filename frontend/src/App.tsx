@@ -16,6 +16,7 @@ function App() {
     const [isConverting, setIsConverting] = useState<boolean>(false);
     const [isImage, setIsImage] = useState<boolean>(false);
     const [base64, setBase64] = useState();
+    const [isUploading, setIsUploading] = useState<boolean>(false);
 
     useEffect(() => {
         console.log(fileURL);
@@ -58,7 +59,7 @@ function App() {
 
         const formData = new FormData();
         formData.append('file', selectedFile);
-
+        setIsUploading(true);
         try {
             const response = await api.post('/upload', formData, {
                 headers: {
@@ -74,6 +75,7 @@ function App() {
             console.error('Error uploading file', error);
             //console.log(error.response);
         }
+        setIsUploading(false);
     };
 
     const fileTypes = ["MP4", "MOV", "PNG", "JPEG"];
@@ -86,24 +88,24 @@ function App() {
                 you can now determine whether a specific play was a first down or not. Just submit a clip below of the play
                 and our algorithm will determine if it was a first down.</p>
             {isConverting && <p>Converting file, please wait...</p>}
-            {selectedFile && !isConverting && !isImage && (
-                <div className="media-container">
-                    <video className="file-url-video" key={fileURL} controls>
+            <div className="left-container">
+                {selectedFile && !isConverting && !isImage && (
+                    <video key={fileURL} className="file-url" controls>
                         <source src={fileURL} type="video/mp4" />
                         Your browser does not support the video tag.
                     </video>
-                </div>
-            )}
-            {selectedFile && !isConverting && isImage && (
-                <img src={fileURL} className="media-container" alt="Display not working" />
-            )}
-            <FileUploader handleChange={handleFileChange} name="files" types={fileTypes} />
-            {selectedFile && (
-                <div className="media-container">
-                    <button className="green-button" onClick={handleUpload} disabled={isConverting}>Detect</button>
-                </div>
-            )}
-            {firstDown && (<img src={`data:image/jpeg;charset=utf-8;base64,${firstDown}`} className="first-down-image" alt="First Down" />
+                )}
+                {selectedFile && !isConverting && isImage && (
+                    <img src={fileURL} className="file-url" alt="Display not working" />
+                )}
+                <FileUploader handleChange={handleFileChange} name="files" types={fileTypes} />
+                <button onClick={handleUpload} className="green-button" disabled={isConverting && isUploading} >Upload</button>
+            </div>
+            {isUploading && (<div>
+                    <div className="loading loading--full-height"></div>
+                    {/* <div className="loading-2 loading-2--full-height"></div> */}
+            </div>)}
+            {firstDown && !isUploading && (<img src={`data:image/jpeg;charset=utf-8;base64,${firstDown}`} width="640" height="360" alt="First Down" />
             )}
         </div>
     );

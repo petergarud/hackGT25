@@ -28,11 +28,6 @@
   color: #61dafb;
 }
 
- 
-.file-url-video {
-  width: 100%;
-  height: 360px;
-}
 
 .green-button {
   background-color: green;
@@ -50,21 +45,26 @@
   transition: background-color 0.3s ease;
 }
 
-.media-container {
-  display: flex;
+.green-button:disabled, green-button[disabled] {
+  background-color: gray; /* Change the background color when the button is clicked */
+  cursor: not-allowed; /* Make the cursor not clickable */
+}
+
+.left-container {
   align-items: center;
   width: 40%;
   margin: 10px;
-  flex: 50%;
-  gap: 10px; /* Optional: Add some space between the video and the image */
+  float: left;
+}
+
+.file-url{
+  width: 100%;
 }
 
 .first-down-image {
   margin: 10px;
-  width : 40%;
-  float : right;
-  flex: 50%;
-  display : flex;
+  width: 100%;
+  float: left;
 }
 
 
@@ -83,4 +83,72 @@ body {
   padding: 40px;
   font-family: Arial;
   text-align: center;
+}
+
+/* Style #1 */
+.loading {
+  margin-top: 170px;
+  display: flex;
+  justify-content: center;
+}
+
+.loading--full-height {
+  align-items: center;
+  height: 100%;
+}
+
+.loading::after {
+  content: "";
+  width: 50px;
+  height: 50px;
+  border: 10px solid #dddddd;
+  border-top-color: #009579;
+  border-radius: 50%;
+  transform: rotate(0.16turn);
+  animation: loading 1s ease infinite;
+}
+
+@keyframes loading {
+  /* Safari support */
+  from {
+    transform: rotate(0turn);
+  }
+  
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+/* Style #2 */
+.loading-2 {
+  display: flex;
+  justify-content: center;
+}
+
+.loading-2--full-height {
+  align-items: center;
+  height: 100%;
+}
+
+.loading-2::after {
+  content: "";
+  width: 50px;
+  height: 50px;
+  background: #009579;
+  opacity: 0.5;
+  border-radius: 50%;
+  animation: loading-2 0.3s ease-in-out infinite alternate;
+}
+
+@keyframes loading-2 {
+  /* Safari support */
+  from {
+    opacity: 0;
+    transform: scale(1);
+  }
+  
+  to {
+    opacity: 1;
+    transform: scale(1.75);
+  }
 }
